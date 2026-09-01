@@ -4,6 +4,18 @@ A loan approval prediction system: a trained SVC (Support Vector Classifier) mod
 wrapped in a Flask API, with two frontend pages — a Stage 2 dashboard for exploring
 the model and a Stage 3 page for trying a live prediction.
 
+## Where to find each stage
+
+- **Stage 1 (model training)**: `stage1_model/loan_trainv4.ipynb` — trains and saves the
+  model to `stage1_model/loan_svc_model_v4.pkl`, using
+  `stage1_model/loan_datav4.csv` as the training data.
+- **Stage 2 (model dashboard + API)**: backend routes in `app.py`, page template at
+  `templates/stage2/stage2_index.html`, frontend logic in
+  `static/stage2/stage2_script.js`.
+- **Stage 3 (prediction page)**: page template at
+  `templates/stage3/stage3_predict.html`, frontend logic in
+  `static/stage3/stage3_predict.js`, served via the `/model/predict` endpoint in `app.py`.
+
 ## Pages
 
 | Page | Route | Purpose |
