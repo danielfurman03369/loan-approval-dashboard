@@ -45,6 +45,9 @@ EDUCATION_MAP = {"Graduate": 1, "Not Graduate": 0}
 MARRIED_MAP = {"Yes": 1, "No": 0}
 LOAN_STATUS_MAP = {"Y": 1, "N": 0}
 
+# The 4 numeric fields the "out of training range" warning applies to.
+NUMERIC_RANGE_COLUMNS = ["ApplicantIncome", "CoapplicantIncome", "LoanAmount", "Loan_Amount_Term"]
+
 FEATURE_DESCRIPTIONS = [
     {
         "name": "ApplicantIncome",
@@ -165,6 +168,21 @@ def model_metrics():
             "test_size": len(y_test),
         }
     )
+
+
+@app.route("/model/feature_ranges")
+def model_feature_ranges():
+    # Live from the training CSV — the actual range of applicants this model has
+    # ever seen, which is what makes a distance-based (RBF) prediction meaningful.
+    ranges = {}
+    for col in NUMERIC_RANGE_COLUMNS:
+        series = DATASET[col].dropna()
+        ranges[col] = {
+            "min": float(series.min()),
+            "max": float(series.max()),
+            "mean": round(float(series.mean()), 1),
+        }
+    return jsonify(ranges)
 
 
 @app.route("/model/support_vectors")

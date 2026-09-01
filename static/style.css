@@ -455,6 +455,20 @@ table.samples tbody tr:last-child td { border-bottom: none; }
 
 .prob-label { display: flex; justify-content: space-between; font-size: .76rem; color: var(--muted); margin-bottom: 6px; }
 .prob-track { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+
+.range-warning {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, .1);
+  border: 1px solid rgba(245, 158, 11, .3);
+  font-size: .8rem;
+  color: #fcd9a3;
+}
+.range-warning-title { font-weight: 700; color: #f59e0b; margin-bottom: 6px; }
+.range-warning ul { margin: 0 0 6px; padding-left: 18px; }
+.range-warning li { margin-bottom: 4px; line-height: 1.5; }
+.range-warning p { margin: 0; color: #fcd9a3; }
 .prob-fill { height: 100%; border-radius: 99px; }
 .result.approved .prob-fill { background: var(--approve); }
 .result.rejected .prob-fill { background: var(--reject); }

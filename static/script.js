@@ -227,6 +227,66 @@ async function loadDecisionBoundary() {
 
 /* ---------- Predict form ---------- */
 
+// Populated from /model/feature_ranges before the form can meaningfully validate.
+let FEATURE_RANGES = null;
+
+const RANGE_FIELD_LABELS = {
+  ApplicantIncome: "applicant income",
+  CoapplicantIncome: "co-applicant income",
+  LoanAmount: "loan amount",
+  Loan_Amount_Term: "loan term",
+};
+
+async function loadFeatureRanges() {
+  try {
+    FEATURE_RANGES = await getJSON("/model/feature_ranges");
+    for (const field of Object.keys(FEATURE_RANGES)) {
+      const input = document.getElementById(field);
+      if (!input) continue;
+      // Soft guidance only — HTML min/max on a number input don't block typing
+      // or submission here, they just inform the field's expected range.
+      input.min = FEATURE_RANGES[field].min;
+      input.max = FEATURE_RANGES[field].max;
+    }
+  } catch (e) {
+    FEATURE_RANGES = null; // Validation step below just skips silently if unavailable.
+  }
+}
+
+// Flags values far outside the training data — more than 2x the observed max,
+// or less than half the observed min. Not a strict statistical cutoff, just a
+// sanity check for a distance-based (RBF) model with no real basis to
+// extrapolate that far.
+function findOutOfRangeFields(payload) {
+  if (!FEATURE_RANGES) return [];
+  const flagged = [];
+  for (const field of Object.keys(RANGE_FIELD_LABELS)) {
+    const range = FEATURE_RANGES[field];
+    const value = payload[field];
+    if (!range || Number.isNaN(value)) continue;
+    if (value > range.max * 2 || value < range.min * 0.5) {
+      flagged.push({ field, value, ...range });
+    }
+  }
+  return flagged;
+}
+
+function renderRangeWarning(flagged) {
+  if (!flagged.length) return "";
+  const items = flagged.map((f) => `
+    <li>This applicant's <strong>${RANGE_FIELD_LABELS[f.field]}</strong> (${f.value.toLocaleString()})
+    is far outside the range of applicants (${f.min.toLocaleString()}–${f.max.toLocaleString()})
+    used to train this model.</li>
+  `).join("");
+  return `
+    <div class="range-warning">
+      <div class="range-warning-title">⚠ Out-of-range input</div>
+      <ul>${items}</ul>
+      <p>Treat this prediction with caution — it may not be reliable.</p>
+    </div>
+  `;
+}
+
 function initPredictForm() {
   const form = document.getElementById("predict-form");
   const resultEl = document.getElementById("result");
@@ -240,6 +300,17 @@ function initPredictForm() {
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const data = Object.fromEntries(new FormData(form).entries());
+
+    // The form uses novalidate so out-of-range numbers don't get silently blocked
+    // by the browser (min/max below are informational only) — but that also
+    // disables the native "required" check, so replicate just that part here.
+    const requiredFields = ["ApplicantIncome", "CoapplicantIncome", "LoanAmount", "Loan_Amount_Term"];
+    const emptyField = requiredFields.find((f) => String(data[f] ?? "").trim() === "");
+    if (emptyField) {
+      resultEl.className = "result show error";
+      resultEl.innerHTML = `Please fill in ${RANGE_FIELD_LABELS[emptyField]}.`;
+      return;
+    }
 
     const payload = {
       ApplicantIncome: Number(data.ApplicantIncome),
@@ -263,12 +334,14 @@ function initPredictForm() {
 
       const approved = res.prediction === 1;
       const p = (res.probability * 100).toFixed(1);
+      const warningHTML = renderRangeWarning(findOutOfRangeFields(payload));
 
       resultEl.className = `result show ${approved ? "approved" : "rejected"}`;
       resultEl.innerHTML = `
         <div class="verdict"><span class="swatch"></span>${approved ? "Approved" : "Rejected"}</div>
         <div class="prob-label"><span>Approval probability</span><span>${p}%</span></div>
         <div class="prob-track"><div class="prob-fill" style="width:${p}%"></div></div>
+        ${warningHTML}
       `;
     } catch (e) {
       resultEl.className = "result show error";
@@ -284,4 +357,5 @@ loadMetricCards();
 loadFeatures();
 loadSamples();
 loadDecisionBoundary();
+loadFeatureRanges();
 initPredictForm();
