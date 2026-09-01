@@ -71,9 +71,6 @@ result is presented with the appropriate caveat rather than false confidence.
 
 ### Issues found and fixed during development
 
-- A data leakage bug in the original training code — `StandardScaler` was being re-fit
-  on the test set instead of just transformed — was fixed by using `.transform()` (not
-  `.fit_transform()`) on test data.
 - An unrelated Node.js scaffold had gotten mixed into the project. It caused the API to
   silently fail and return HTML error pages instead of JSON. It was removed; `app.py` is
   now the sole backend entry point.
