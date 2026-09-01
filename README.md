@@ -19,6 +19,10 @@ live predictions.
 
 ## How to run it
 
+There are two supported ways to run this project.
+
+### Option A — Flask only (simplest)
+
 ```bash
 pip install -r requirements.txt
 python app.py
@@ -26,10 +30,25 @@ python app.py
 
 Then open **http://localhost:5000/** in a browser.
 
-Do **not** open `index.html` directly, and don't serve it with a static file server
-(e.g. VS Code's Live Server) on its own. The dashboard's API calls only work when Flask
-itself is running — Flask serves both the HTML page and the `/model/*` routes together
-on the same port, and a static server has no way to answer those routes.
+### Option B — Live Server for the frontend, Flask for the API
+
+Useful for faster CSS/JS iteration, since Live Server auto-reloads the page on file
+changes.
+
+1. In one terminal, start Flask and leave it running — this is what serves all the
+   `/model/*` API routes:
+   ```bash
+   pip install -r requirements.txt
+   python app.py
+   ```
+2. In VS Code, right-click `templates/index.html` and choose **"Open with Live Server"**
+   (or click **"Go Live"** in the status bar).
+
+Either way, Flask must be running in a terminal for the API to work — Live Server only
+ever serves the static HTML/CSS/JS, never the backend. The frontend detects which way
+it was loaded and points its API calls at Flask automatically (see `API_BASE` in
+`static/script.js`), with CORS enabled on the Flask side to allow the cross-origin
+requests from Live Server's origin.
 
 ## The model
 

@@ -3,6 +3,12 @@
  * Pulls live data from the Flask API and renders it — no state is hardcoded here.
  */
 
+// Relative paths work when Flask itself serves this page (port 5000). When the
+// page is instead opened via a static server — e.g. VS Code's Live Server, on
+// port 5500 — fetches need to point at Flask explicitly, since the static
+// server can't answer /model/* routes itself.
+const API_BASE = window.location.port === "5000" ? "" : "http://127.0.0.1:5000";
+
 const ACCENTS = ["#06b6d4", "#8b5cf6", "#22c55e", "#f59e0b", "#3b82f6", "#ec4899", "#14b8a6"];
 
 const FEATURE_ICONS = {
@@ -38,11 +44,16 @@ function pct(x) { return (x * 100).toFixed(1) + "%"; }
 /* ---------- Model details + file card + base URL ---------- */
 
 async function loadModelInfo() {
-  document.getElementById("base-url").textContent = window.location.origin;
+  // The actual base the API calls use — Flask's own origin, not necessarily
+  // this page's origin (they differ when served via Live Server).
+  document.getElementById("base-url").textContent = API_BASE || window.location.origin;
+  // A plain <a href> would otherwise resolve against Live Server's own origin,
+  // which has no /model/download route at all — point it at Flask explicitly.
+  document.getElementById("download-link").href = `${API_BASE}/model/download`;
 
   const el = document.getElementById("model-details");
   try {
-    const info = await getJSON("/model/info");
+    const info = await getJSON(`${API_BASE}/model/info`);
     const row = (label, value, mono) => `
       <div class="kv-row"><dt>${label}</dt><dd${mono ? ' class="mono"' : ""}>${value}</dd></div>
     `;
@@ -72,8 +83,8 @@ async function loadModelInfo() {
 async function loadMetricCards() {
   try {
     const [m, sv] = await Promise.all([
-      getJSON("/model/metrics"),
-      getJSON("/model/support_vectors"),
+      getJSON(`${API_BASE}/model/metrics`),
+      getJSON(`${API_BASE}/model/support_vectors`),
     ]);
     document.getElementById("m-accuracy").textContent = pct(m.accuracy);
     document.getElementById("m-precision").textContent = pct(m.precision);
@@ -92,7 +103,7 @@ async function loadMetricCards() {
 async function loadFeatures() {
   const el = document.getElementById("feature-rows");
   try {
-    const features = await getJSON("/model/features");
+    const features = await getJSON(`${API_BASE}/model/features`);
     el.innerHTML = features.map((f, i) => `
       <li>
         <span class="feature-dot" style="--fc:${ACCENTS[i % ACCENTS.length]}">${FEATURE_ICONS[f.name] || "🔹"}</span>
@@ -112,7 +123,7 @@ async function loadFeatures() {
 async function loadSamples() {
   const table = document.getElementById("samples-table");
   try {
-    const rows = await getJSON("/model/samples");
+    const rows = await getJSON(`${API_BASE}/model/samples`);
     if (!rows.length) throw new Error("No sample rows returned");
 
     const thead = `<thead><tr>${SAMPLE_COLUMNS.map(c => `<th>${escapeHTML(c)}</th>`).join("")}</tr></thead>`;
@@ -138,7 +149,7 @@ async function loadSamples() {
 async function loadDecisionBoundary() {
   const el = document.getElementById("decision-plot");
   try {
-    const d = await getJSON("/model/decision_boundary");
+    const d = await getJSON(`${API_BASE}/model/decision_boundary`);
 
     const classColor = { 0: "#ec4899", 1: "#3b82f6" };
     const classLabel = { 0: "Predicted: Rejected", 1: "Predicted: Approved" };
@@ -239,7 +250,7 @@ const RANGE_FIELD_LABELS = {
 
 async function loadFeatureRanges() {
   try {
-    FEATURE_RANGES = await getJSON("/model/feature_ranges");
+    FEATURE_RANGES = await getJSON(`${API_BASE}/model/feature_ranges`);
     for (const field of Object.keys(FEATURE_RANGES)) {
       const input = document.getElementById(field);
       if (!input) continue;
@@ -348,7 +359,7 @@ function initPredictForm() {
     resultEl.innerHTML = `<p class="placeholder">Scoring application…</p>`;
 
     try {
-      const res = await getJSON("/model/predict", {
+      const res = await getJSON(`${API_BASE}/model/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

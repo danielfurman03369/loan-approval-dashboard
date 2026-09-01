@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, request, render_template, send_from_directory, abort
+from flask_cors import CORS
 from joblib import load as load_model
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
@@ -80,6 +81,7 @@ FEATURE_DESCRIPTIONS = [
 ]
 
 app = Flask(__name__)
+CORS(app)  # local dev only, fine to allow all origins since this never leaves localhost
 
 MODEL = load_model(MODEL_PATH)
 SVC = MODEL.named_steps["svc"]
