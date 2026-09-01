@@ -33,10 +33,10 @@ on the same port, and a static server has no way to answer those routes.
 
 ## The model
 
-An SVC (linear kernel) predicts loan approval (Y/N) from 7 features: `ApplicantIncome`,
+An SVC (RBF kernel) predicts loan approval (Y/N) from 7 features: `ApplicantIncome`,
 `CoapplicantIncome`, `LoanAmount`, `Loan_Amount_Term`, `Credit_History`, `Education`,
-and `Married`. On the held-out test split, it achieves **85.4% accuracy** (83.2%
-precision, 98.8% recall, 90.3% F1 on the "approved" class).
+and `Married`. On the held-out test split, it achieves **86.2% accuracy** (86.2%
+precision, 95.3% recall, 90.5% F1 on the "approved" class).
 
 `ApplicantIncome` and `CoapplicantIncome` are **monthly** income figures, as defined in
 the original dataset (Dream Housing Finance, a home loan company) — enter realistic
