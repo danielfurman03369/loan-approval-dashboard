@@ -66,3 +66,34 @@ of empirical models generally, not a bug. The dashboard's prediction form reflec
 it warns when a submitted value — or a combination, like an implied loan-to-income ratio
 far beyond what's typical — falls far outside the training data's observed range, so the
 result is presented with the appropriate caveat rather than false confidence.
+
+## Known limitations
+
+### Issues found and fixed during development
+
+- A data leakage bug in the original training code — `StandardScaler` was being re-fit
+  on the test set instead of just transformed — was fixed by using `.transform()` (not
+  `.fit_transform()`) on test data.
+- An unrelated Node.js scaffold had gotten mixed into the project. It caused the API to
+  silently fail and return HTML error pages instead of JSON. It was removed; `app.py` is
+  now the sole backend entry point.
+
+### Limitations of the training data (not fixable by code)
+
+- `loan_datav4.csv` has only 614 rows, which is small for a model with 7 input features.
+- Predictions are noticeably less reliable in sparse regions of the training distribution.
+  Applicants with unusually high combined income (over $20,000/month) make up only about
+  3% of the training data (18 of 614 rows), and the single highest-income row in the whole
+  dataset happened to be a rejected application. As a result, approval probability can
+  behave non-monotonically as income increases — e.g. rising, then falling, then rising
+  again — which reflects a lack of real training examples in that range rather than a
+  genuine learned pattern.
+- No individual feature captures the *relationship* between loan amount and income — two
+  values can each look individually plausible (a modest income, a modest-looking loan
+  amount) while their combination is unrealistic. The loan-to-income ratio check on the
+  prediction form partially mitigates this, but a model trained with that ratio as an
+  explicit feature would handle it more robustly.
+
+These are inherent properties of training on a small, real-world dataset, not
+implementation bugs. A larger or more balanced dataset would be the actual fix, not
+further code changes.
