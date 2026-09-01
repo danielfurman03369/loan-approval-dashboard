@@ -1,9 +1,9 @@
 """
 Loan Approval Model — Stage 2 API
 
-Loads the pre-trained SVC pipeline (s1_model/loan_svc_model_v4.pkl) and exposes it
+Loads the pre-trained SVC pipeline (stage1_model/loan_svc_model_v4.pkl) and exposes it
 through a small Flask API, plus serves the dashboard page that visualizes it. The model
-itself is never retrained or modified here — see s1_model/loan_trainv4.ipynb for that.
+itself is never retrained or modified here — see stage1_model/loan_trainv4.ipynb for that.
 """
 
 import hashlib
@@ -26,8 +26,8 @@ from sklearn.metrics import (
     classification_report,
 )
 
-MODEL_PATH = Path("s1_model/loan_svc_model_v4.pkl")
-DATA_PATH = Path("s1_model/loan_datav4.csv")
+MODEL_PATH = Path("stage1_model/loan_svc_model_v4.pkl")
+DATA_PATH = Path("stage1_model/loan_datav4.csv")
 
 # Exact column order the pipeline was fit on (see loan_trainv4.ipynb, cell 2-3).
 FEATURE_COLUMNS = [
@@ -109,12 +109,12 @@ def transform_to_scaled_space(X: pd.DataFrame) -> np.ndarray:
 
 @app.route("/")
 def dashboard():
-    return render_template("s2/index.html")
+    return render_template("stage2/stage2_index.html")
 
 
 @app.route("/predict-page")
 def predict_page():
-    return render_template("s3/predict.html")
+    return render_template("stage3/stage3_predict.html")
 
 
 @app.route("/model/info")
