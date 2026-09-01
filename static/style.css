@@ -389,9 +389,14 @@ table.samples tbody tr:last-child td { border-bottom: none; }
 }
 .field select option { background: #141a30; }
 
-.predict-submit {
-  width: 100%;
+.predict-actions {
+  display: flex;
+  gap: 10px;
   margin-top: 4px;
+}
+
+.predict-submit {
+  flex: 1;
   padding: 12px 16px;
   border: none;
   border-radius: 10px;
@@ -403,6 +408,19 @@ table.samples tbody tr:last-child td { border-bottom: none; }
   cursor: pointer;
 }
 .predict-submit:hover { filter: brightness(1.08); }
+
+.predict-reset {
+  padding: 12px 20px;
+  border: 1px solid color-mix(in srgb, var(--c) 45%, var(--border));
+  border-radius: 10px;
+  background: transparent;
+  color: var(--c);
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.predict-reset:hover { background: color-mix(in srgb, var(--c) 12%, transparent); }
 
 .result {
   margin-top: 18px;

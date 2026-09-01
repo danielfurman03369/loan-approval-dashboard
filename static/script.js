@@ -231,6 +231,12 @@ function initPredictForm() {
   const form = document.getElementById("predict-form");
   const resultEl = document.getElementById("result");
 
+  // Native form reset clears the inputs/selects; it doesn't touch the result panel.
+  form.addEventListener("reset", () => {
+    resultEl.className = "result";
+    resultEl.innerHTML = "";
+  });
+
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const data = Object.fromEntries(new FormData(form).entries());
