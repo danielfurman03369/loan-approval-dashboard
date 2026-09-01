@@ -38,6 +38,10 @@ An SVC (RBF kernel) predicts loan approval (Y/N) from 7 features: `ApplicantInco
 and `Married`. On the held-out test split, it achieves **82.9% accuracy** (84.8%
 precision, 91.8% recall, 88.1% F1 on the "approved" class).
 
+`ApplicantIncome` and `CoapplicantIncome` are **monthly** income figures, as defined in
+the original dataset (Dream Housing Finance, a home loan company) — enter realistic
+monthly values when trying a prediction, not an annual salary.
+
 ## API endpoints
 
 | Method | Path | Returns |
