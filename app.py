@@ -1,9 +1,9 @@
 """
 Loan Approval Model — Stage 2 API
 
-Loads the pre-trained SVC pipeline (loan_svc_model_v4.pkl) and exposes it through a
-small Flask API, plus serves the dashboard page that visualizes it. The model itself
-is never retrained or modified here — see loan_trainv4.ipynb for that.
+Loads the pre-trained SVC pipeline (s1_model/loan_svc_model_v4.pkl) and exposes it
+through a small Flask API, plus serves the dashboard page that visualizes it. The model
+itself is never retrained or modified here — see s1_model/loan_trainv4.ipynb for that.
 """
 
 import hashlib
@@ -26,8 +26,8 @@ from sklearn.metrics import (
     classification_report,
 )
 
-MODEL_PATH = Path("loan_svc_model_v4.pkl")
-DATA_PATH = Path("loan_datav4.csv")
+MODEL_PATH = Path("s1_model/loan_svc_model_v4.pkl")
+DATA_PATH = Path("s1_model/loan_datav4.csv")
 
 # Exact column order the pipeline was fit on (see loan_trainv4.ipynb, cell 2-3).
 FEATURE_COLUMNS = [
@@ -109,12 +109,12 @@ def transform_to_scaled_space(X: pd.DataFrame) -> np.ndarray:
 
 @app.route("/")
 def dashboard():
-    return render_template("index.html")
+    return render_template("s2/index.html")
 
 
 @app.route("/predict-page")
 def predict_page():
-    return render_template("predict.html")
+    return render_template("s3/predict.html")
 
 
 @app.route("/model/info")
@@ -308,7 +308,7 @@ def model_predict():
 def model_download():
     if not MODEL_PATH.exists():
         abort(404)
-    return send_from_directory(".", MODEL_PATH.name, as_attachment=True)
+    return send_from_directory(MODEL_PATH.parent, MODEL_PATH.name, as_attachment=True)
 
 
 if __name__ == "__main__":

@@ -16,17 +16,36 @@ the same `/model/*` API routes.
 
 ## Project structure
 
+Files are grouped by which stage of the project they belong to.
+
+**Stage 1 — training** (`s1_model/`)
+
+| File | Purpose |
+|---|---|
+| `s1_model/loan_trainv4.ipynb` | Training notebook showing how the model was built (reference only) |
+| `s1_model/loan_datav4.csv` | Training dataset (Analytics Vidhya loan prediction data) |
+| `s1_model/loan_svc_model_v4.pkl` | The saved, trained model pipeline (imputer + scaler + SVC) |
+
+**Stage 2 — model dashboard/API** (`templates/s2/`, `static/s2/`)
+
+| File | Purpose |
+|---|---|
+| `templates/s2/index.html` | The Stage 2 model dashboard page |
+| `static/s2/script.js` | Stage 2 dashboard logic — fetches from the API and renders everything |
+
+**Stage 3 — end-user prediction page** (`templates/s3/`, `static/s3/`)
+
+| File | Purpose |
+|---|---|
+| `templates/s3/predict.html` | The Stage 3 prediction page |
+| `static/s3/predict.js` | Stage 3 prediction form logic — validation, submission, and result rendering |
+
+**Shared / top-level**
+
 | File / folder | Purpose |
 |---|---|
-| `app.py` | Flask backend — loads the trained model and exposes all API endpoints and pages |
-| `loan_trainv4.ipynb` | Training notebook showing how the model was built (reference only) |
-| `loan_datav4.csv` | Training dataset (Analytics Vidhya loan prediction data) |
-| `loan_svc_model_v4.pkl` | The saved, trained model pipeline (imputer + scaler + SVC) |
-| `templates/index.html` | The Stage 2 model dashboard page |
-| `templates/predict.html` | The Stage 3 prediction page |
-| `static/script.js` | Stage 2 dashboard logic — fetches from the API and renders everything |
-| `static/predict.js` | Stage 3 prediction form logic — validation, submission, and result rendering |
-| `static/style.css` | Shared styling for both pages |
+| `app.py` | Flask backend — loads the trained model (from `s1_model/`) and exposes all API endpoints and both pages |
+| `static/shared/style.css` | Styling shared by both the Stage 2 and Stage 3 pages |
 | `requirements.txt` | Python dependencies |
 
 ## How to run it
@@ -53,14 +72,14 @@ changes.
    pip install -r requirements.txt
    python app.py
    ```
-2. In VS Code, right-click `templates/index.html` or `templates/predict.html` and choose
-   **"Open with Live Server"** (or click **"Go Live"** in the status bar).
+2. In VS Code, right-click `templates/s2/index.html` or `templates/s3/predict.html` and
+   choose **"Open with Live Server"** (or click **"Go Live"** in the status bar).
 
 Either way, Flask must be running in a terminal for the API to work — Live Server only
 ever serves the static HTML/CSS/JS, never the backend. The frontend detects which way
 it was loaded and points its API calls at Flask automatically (see `API_BASE` at the top
-of `static/script.js` and `static/predict.js`), with CORS enabled on the Flask side to
-allow the cross-origin requests from Live Server's origin.
+of `static/s2/script.js` and `static/s3/predict.js`), with CORS enabled on the Flask side
+to allow the cross-origin requests from Live Server's origin.
 
 ## The model
 
@@ -108,7 +127,7 @@ so the result is presented with the appropriate caveat rather than false confide
 
 ### Limitations of the training data (not fixable by code)
 
-- `loan_datav4.csv` has only 614 rows, which is small for a model with 7 input features.
+- `s1_model/loan_datav4.csv` has only 614 rows, which is small for a model with 7 input features.
 - Predictions are noticeably less reliable in sparse regions of the training distribution.
   Applicants with unusually high combined income (over $20,000/month) make up only about
   3% of the training data (18 of 614 rows), and the single highest-income row in the whole
