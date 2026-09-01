@@ -255,7 +255,7 @@ async function loadFeatureRanges() {
 
 // Flags values far outside the training data — more than 2x the observed max,
 // or less than half the observed min. Not a strict statistical cutoff, just a
-// sanity check for a distance-based (RBF) model with no real basis to
+// sanity check for a model with no real basis to
 // extrapolate that far.
 function findOutOfRangeFields(payload) {
   if (!FEATURE_RANGES) return [];
@@ -268,12 +268,34 @@ function findOutOfRangeFields(payload) {
       flagged.push({ field, value, ...range });
     }
   }
+
+  flagged.push(...findLoanToIncomeIssue(payload));
   return flagged;
+}
+
+// Relational check on top of the per-field ones above: ApplicantIncome=100 and
+// LoanAmount=100 (thousands) can each look individually plausible while
+// jointly implying a loan worth ~1,000 months of income — nonsensical, but
+// invisible to a check that only ever looks at one field at a time.
+function findLoanToIncomeIssue(payload) {
+  const range = FEATURE_RANGES && FEATURE_RANGES.LoanToIncomeRatio;
+  const monthlyIncome = payload.ApplicantIncome + payload.CoapplicantIncome;
+  if (!range || !(monthlyIncome > 0) || Number.isNaN(payload.LoanAmount)) return [];
+
+  const ratio = (payload.LoanAmount * 1000) / monthlyIncome;
+  if (ratio > range.max * 2 || ratio < range.min * 0.5) {
+    return [{ field: "LoanToIncomeRatio", value: ratio, ...range, isRatio: true }];
+  }
+  return [];
 }
 
 function renderRangeWarning(flagged) {
   if (!flagged.length) return "";
-  const items = flagged.map((f) => `
+  const items = flagged.map((f) => f.isRatio ? `
+    <li>This application's <strong>loan amount relative to income</strong> is far outside
+    what's typical for applicants in the training data (a loan-to-income ratio of
+    ${f.value.toFixed(1)} vs. typically up to ${f.max.toFixed(1)}).</li>
+  ` : `
     <li>This applicant's <strong>${RANGE_FIELD_LABELS[f.field]}</strong> (${f.value.toLocaleString()})
     is far outside the range of applicants (${f.min.toLocaleString()}–${f.max.toLocaleString()})
     used to train this model.</li>

@@ -33,10 +33,10 @@ on the same port, and a static server has no way to answer those routes.
 
 ## The model
 
-An SVC (RBF kernel) predicts loan approval (Y/N) from 7 features: `ApplicantIncome`,
+An SVC (linear kernel) predicts loan approval (Y/N) from 7 features: `ApplicantIncome`,
 `CoapplicantIncome`, `LoanAmount`, `Loan_Amount_Term`, `Credit_History`, `Education`,
-and `Married`. On the held-out test split, it achieves **82.9% accuracy** (84.8%
-precision, 91.8% recall, 88.1% F1 on the "approved" class).
+and `Married`. On the held-out test split, it achieves **85.4% accuracy** (83.2%
+precision, 98.8% recall, 90.3% F1 on the "approved" class).
 
 `ApplicantIncome` and `CoapplicantIncome` are **monthly** income figures, as defined in
 the original dataset (Dream Housing Finance, a home loan company) — enter realistic
@@ -58,10 +58,11 @@ monthly values when trying a prediction, not an annual salary.
 
 ## A note on prediction reliability
 
-This is a distance-based model (SVC with an RBF kernel), so it has no real basis for
-predicting on inputs far outside the range of applicants it was actually trained on —
-e.g. an unusually high or low income. A prediction on such an input isn't a meaningful
-risk assessment, just extrapolated noise. This is a property of the model type, not a
-bug. The dashboard's prediction form reflects this: it shows a warning when a submitted
-value falls far outside the training data's observed range, so the result is presented
-with the appropriate caveat rather than false confidence.
+This model was fit to a specific, finite range of applicants (see `/model/feature_ranges`),
+so it has no real basis for predicting on inputs far outside that range — e.g. an
+unusually high or low income. A prediction on such an input isn't a meaningful risk
+assessment, just extrapolation beyond anything the model has seen. This is a property
+of empirical models generally, not a bug. The dashboard's prediction form reflects this:
+it warns when a submitted value — or a combination, like an implied loan-to-income ratio
+far beyond what's typical — falls far outside the training data's observed range, so the
+result is presented with the appropriate caveat rather than false confidence.

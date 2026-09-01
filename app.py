@@ -173,7 +173,7 @@ def model_metrics():
 @app.route("/model/feature_ranges")
 def model_feature_ranges():
     # Live from the training CSV — the actual range of applicants this model has
-    # ever seen, which is what makes a distance-based (RBF) prediction meaningful.
+    # ever seen, which is what makes an in-distribution prediction meaningful.
     ranges = {}
     for col in NUMERIC_RANGE_COLUMNS:
         series = DATASET[col].dropna()
@@ -182,6 +182,20 @@ def model_feature_ranges():
             "max": float(series.max()),
             "mean": round(float(series.mean()), 1),
         }
+
+    # A relational check on top of the per-field ones: two individually-plausible
+    # values (e.g. a modest income and a modest loan amount) can still combine
+    # into a nonsensical loan-to-income ratio. LoanAmount is in thousands, so
+    # *1000 puts it in the same units as the income fields before dividing.
+    monthly_income = DATASET["ApplicantIncome"] + DATASET["CoapplicantIncome"].fillna(0)
+    ratio = (DATASET["LoanAmount"] * 1000) / monthly_income
+    ratio = ratio[(monthly_income > 0) & ratio.notna()]
+    ranges["LoanToIncomeRatio"] = {
+        "min": float(ratio.min()),
+        "max": float(ratio.max()),
+        "mean": round(float(ratio.mean()), 1),
+    }
+
     return jsonify(ranges)
 
 
