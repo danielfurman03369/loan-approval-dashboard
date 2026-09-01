@@ -1,20 +1,32 @@
 # Loan Approval Prediction Model
 
 A loan approval prediction system: a trained SVC (Support Vector Classifier) model
-wrapped in a Flask API, with a dashboard frontend for exploring the model and trying
-live predictions.
+wrapped in a Flask API, with two frontend pages — a Stage 2 dashboard for exploring
+the model and a Stage 3 page for trying a live prediction.
+
+## Pages
+
+| Page | Route | Purpose |
+|---|---|---|
+| Model dashboard | `/` | Stage 2 — model config, metrics, dataset samples, decision boundary, API reference, model file/download |
+| Try a Prediction | `/predict-page` | Stage 3 — the end-user-facing tool a loan applicant would use to check their eligibility |
+
+The two pages link to each other via a small nav link in their header, and both call
+the same `/model/*` API routes.
 
 ## Project structure
 
 | File / folder | Purpose |
 |---|---|
-| `app.py` | Flask backend — loads the trained model and exposes all API endpoints |
+| `app.py` | Flask backend — loads the trained model and exposes all API endpoints and pages |
 | `loan_trainv4.ipynb` | Training notebook showing how the model was built (reference only) |
 | `loan_datav4.csv` | Training dataset (Analytics Vidhya loan prediction data) |
 | `loan_svc_model_v4.pkl` | The saved, trained model pipeline (imputer + scaler + SVC) |
-| `templates/index.html` | The dashboard page |
-| `static/script.js` | Frontend logic — fetches from the API and renders everything |
-| `static/style.css` | Dashboard styling |
+| `templates/index.html` | The Stage 2 model dashboard page |
+| `templates/predict.html` | The Stage 3 prediction page |
+| `static/script.js` | Stage 2 dashboard logic — fetches from the API and renders everything |
+| `static/predict.js` | Stage 3 prediction form logic — validation, submission, and result rendering |
+| `static/style.css` | Shared styling for both pages |
 | `requirements.txt` | Python dependencies |
 
 ## How to run it
@@ -41,14 +53,14 @@ changes.
    pip install -r requirements.txt
    python app.py
    ```
-2. In VS Code, right-click `templates/index.html` and choose **"Open with Live Server"**
-   (or click **"Go Live"** in the status bar).
+2. In VS Code, right-click `templates/index.html` or `templates/predict.html` and choose
+   **"Open with Live Server"** (or click **"Go Live"** in the status bar).
 
 Either way, Flask must be running in a terminal for the API to work — Live Server only
 ever serves the static HTML/CSS/JS, never the backend. The frontend detects which way
-it was loaded and points its API calls at Flask automatically (see `API_BASE` in
-`static/script.js`), with CORS enabled on the Flask side to allow the cross-origin
-requests from Live Server's origin.
+it was loaded and points its API calls at Flask automatically (see `API_BASE` at the top
+of `static/script.js` and `static/predict.js`), with CORS enabled on the Flask side to
+allow the cross-origin requests from Live Server's origin.
 
 ## The model
 
@@ -81,10 +93,10 @@ This model was fit to a specific, finite range of applicants (see `/model/featur
 so it has no real basis for predicting on inputs far outside that range — e.g. an
 unusually high or low income. A prediction on such an input isn't a meaningful risk
 assessment, just extrapolation beyond anything the model has seen. This is a property
-of empirical models generally, not a bug. The dashboard's prediction form reflects this:
-it warns when a submitted value — or a combination, like an implied loan-to-income ratio
-far beyond what's typical — falls far outside the training data's observed range, so the
-result is presented with the appropriate caveat rather than false confidence.
+of empirical models generally, not a bug. The prediction form (`/predict-page`) reflects
+this: it warns when a submitted value — or a combination, like an implied loan-to-income
+ratio far beyond what's typical — falls far outside the training data's observed range,
+so the result is presented with the appropriate caveat rather than false confidence.
 
 ## Known limitations
 

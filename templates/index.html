@@ -13,6 +13,9 @@
   <main>
 
     <!-- ===== Header ===== -->
+    <nav class="page-nav">
+      <a href="/predict-page" class="page-nav-link">Try a Prediction →</a>
+    </nav>
     <header class="dash-header">
       <div class="header-copy">
         <h1>Loan Approval Prediction Model</h1>
@@ -176,67 +179,6 @@
         </div>
         <div class="checksum"><span class="cs-label">SHA256</span><span id="file-checksum">—</span></div>
         <a href="/model/download" id="download-link" class="download-btn">⬇ Download Model File</a>
-      </div>
-    </section>
-
-    <!-- ===== Try a Prediction (kept functionality) ===== -->
-    <section>
-      <div class="card predict-card" style="--c:#f43f5e">
-        <div class="card-header"><h2>Try a Prediction</h2></div>
-        <p class="hint">Score a hypothetical application against the live model.</p>
-
-        <form id="predict-form" novalidate>
-          <div class="field-row">
-            <div class="field">
-              <label for="ApplicantIncome">Applicant income (monthly)</label>
-              <input id="ApplicantIncome" name="ApplicantIncome" type="number" min="0" step="1" placeholder="5000" required />
-            </div>
-            <div class="field">
-              <label for="CoapplicantIncome">Co-applicant income (monthly)</label>
-              <input id="CoapplicantIncome" name="CoapplicantIncome" type="number" min="0" step="1" placeholder="0" required />
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="LoanAmount">Loan amount (thousands)</label>
-              <input id="LoanAmount" name="LoanAmount" type="number" min="0" step="1" placeholder="150" required />
-            </div>
-            <div class="field">
-              <label for="Loan_Amount_Term">Term (days)</label>
-              <input id="Loan_Amount_Term" name="Loan_Amount_Term" type="number" min="0" step="1" placeholder="360" required />
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="Credit_History">Credit history</label>
-              <select id="Credit_History" name="Credit_History">
-                <option value="1">Good (1)</option>
-                <option value="0">Bad (0)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="Education">Education</label>
-              <select id="Education" name="Education">
-                <option value="Graduate">Graduate</option>
-                <option value="Not Graduate">Not Graduate</option>
-              </select>
-            </div>
-          </div>
-          <div class="field full">
-            <label for="Married">Marital status</label>
-            <select id="Married" name="Married">
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-          </div>
-
-          <div class="predict-actions">
-            <button type="submit" class="predict-submit">Run prediction</button>
-            <button type="reset" class="predict-reset" id="predict-reset">Reset</button>
-          </div>
-        </form>
-
-        <div class="result" id="result"></div>
       </div>
     </section>
 

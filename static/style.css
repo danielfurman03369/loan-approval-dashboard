@@ -38,6 +38,28 @@ main {
 
 a { color: inherit; }
 
+/* ---------- Page nav ---------- */
+
+.page-nav {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -8px;
+}
+.page-nav-link {
+  font-size: .82rem;
+  font-weight: 700;
+  color: #c7cdda;
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .03);
+}
+.page-nav-link:hover {
+  border-color: rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, .06);
+}
+
 /* ---------- Header ---------- */
 
 .dash-header {

@@ -112,6 +112,11 @@ def dashboard():
     return render_template("index.html")
 
 
+@app.route("/predict-page")
+def predict_page():
+    return render_template("predict.html")
+
+
 @app.route("/model/info")
 def model_info():
     return jsonify(

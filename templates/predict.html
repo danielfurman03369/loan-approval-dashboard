@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Check Your Loan Eligibility</title>
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <main>
+
+    <!-- ===== Header ===== -->
+    <nav class="page-nav">
+      <a href="/" class="page-nav-link">← View model dashboard</a>
+    </nav>
+    <header class="dash-header">
+      <div class="header-copy">
+        <h1>Check Your Loan Eligibility</h1>
+        <div class="header-meta">
+          <span class="model-type">SVC (Support Vector Classifier)</span>
+          <span class="version-pill">v1.0</span>
+        </div>
+        <p class="header-desc">
+          Enter your details below to see whether an application like yours would be
+          approved or rejected, based on the trained loan approval model.
+        </p>
+      </div>
+    </header>
+
+    <!-- ===== Try a Prediction ===== -->
+    <section>
+      <div class="card predict-card" style="--c:#f43f5e">
+        <div class="card-header"><h2>Try a Prediction</h2></div>
+        <p class="hint">Score a hypothetical application against the live model.</p>
+
+        <form id="predict-form" novalidate>
+          <div class="field-row">
+            <div class="field">
+              <label for="ApplicantIncome">Applicant income (monthly)</label>
+              <input id="ApplicantIncome" name="ApplicantIncome" type="number" min="0" step="1" placeholder="5000" required />
+            </div>
+            <div class="field">
+              <label for="CoapplicantIncome">Co-applicant income (monthly)</label>
+              <input id="CoapplicantIncome" name="CoapplicantIncome" type="number" min="0" step="1" placeholder="0" required />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="LoanAmount">Loan amount (thousands)</label>
+              <input id="LoanAmount" name="LoanAmount" type="number" min="0" step="1" placeholder="150" required />
+            </div>
+            <div class="field">
+              <label for="Loan_Amount_Term">Term (days)</label>
+              <input id="Loan_Amount_Term" name="Loan_Amount_Term" type="number" min="0" step="1" placeholder="360" required />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="Credit_History">Credit history</label>
+              <select id="Credit_History" name="Credit_History">
+                <option value="1">Good (1)</option>
+                <option value="0">Bad (0)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="Education">Education</label>
+              <select id="Education" name="Education">
+                <option value="Graduate">Graduate</option>
+                <option value="Not Graduate">Not Graduate</option>
+              </select>
+            </div>
+          </div>
+          <div class="field full">
+            <label for="Married">Marital status</label>
+            <select id="Married" name="Married">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <div class="predict-actions">
+            <button type="submit" class="predict-submit">Run prediction</button>
+            <button type="reset" class="predict-reset" id="predict-reset">Reset</button>
+          </div>
+        </form>
+
+        <div class="result" id="result"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>Stage 3 · End-user loan eligibility check, backed by the same live model</footer>
+
+  <script src="/static/predict.js"></script>
+</body>
+</html>
